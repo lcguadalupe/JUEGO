@@ -63,8 +63,8 @@ clock = pygame.time.Clock()
 #posicion inicial del jugador 
 playerX = 370
 playerY = 470
-player_change = 0
-player_change = 0
+playerx_change = 0
+playery_change = 0
 
 
 #lista para almacenar pocisiones de los enemigos
@@ -90,4 +90,96 @@ for i in range(no_of_enemies):
     enemyY.append(random.randint(0,150))
 
     #se establece la velocidad de movimiento del enemigo en X e Y
+    enemyX_change.append(5)
+    enemyY_change.append(20)
+
+    #se inicializan las variables para guardar la posicion de la bala
+    bulletX = 0
+    bulletY = 480
+    bulletX_change = 0
+    bulletY_change = 10
+    bullet_state = "ready"
+
+    #se inicializa la puntuacion en 0
+    score = 0
+
+    #funcion para mostrar la puntuacion en la pantalla 
+    def show_score():
+        score_value = font.render("SCORE " + str(score), True, (255, 255, 255))
+        screen.blit(score_value, (10, 10))
+
+    #funcion para dibujar al jugador en la pantalla 
+    def player(x , y , i):
+        screen.blit(playerimg, (x , y))
+
+    #funcion para dibujar al enemigo en la pantalla 
+    def enemy(x, y , i):
+        screen.blit(enemyimg[i], (x , y))
     
+    #funcion para disparar la bala
+    def fire_bullet(x, y):
+        global bullet_state
+
+        bullet_state = "fire"
+        screen.blit(bulletimg, (x + 16, y +10) )
+
+    #funcion para comprobar si ha habido una colision entre la bala y el enemigo 
+    def isCollision(enemyX , enemyY, bulletX, bulletY):
+        distance = math.sqrt((math.pow(enemyX-bulletX, 2)) +
+                             (math.pow(enemyY-bulletY, 2)))
+
+        if distance < 27:
+            return True
+        else:
+            return False        
+
+    #funcion para mostrar el texto de game over en pantalla 
+    def game_over_text():
+        over_text = over_font.render("GAME OVER", True, (255, 255, 255))
+        text_rect = over_text.get_rect(
+            center=(int(screen_width/2), int(screen_height/2)))
+        screen.blit(over_text, text_rect)
+
+    #funcion principal del juego 
+    def gameloop():
+
+        #declara variables globales 
+        global score
+        global playerX
+        global playerx_change
+        global bulletX
+        global bulletY
+        global Collision
+        global bullet_state
+
+        in_game = True
+        while in_game:
+            #maneja eventos, actualiza y renderiza el juego
+            #limpia la pantalla
+            screen.fill(0, 0, 0)
+            screen.blit(background, (0, 0))
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    in_game = False
+                    pygame.quit()
+                    sys.exit()
+
+                    if event.type == pygame.KEYDOWN:
+                        #maneja el movimiento del jugdor y el disparo
+                        if event.key == pygame.K_LEFT:
+                            playerx_change = -5
+
+                        if event.key == pygame.K_RIGHT:
+                            playerx_change = 5
+
+                        if event.key == pygame.K_SPACE:
+                            if bullet_state == "ready":
+                                bulletX = playerX
+                                fire_bullet(bulletX, bulletY)
+
+                        if event.type == pygame.KEYUP:
+                            playerx_change = 0
+
+                            #aqui esta axtualizando la posicion del jugador 
+
